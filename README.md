@@ -1,0 +1,1 @@
+Ini adalah aplikasi kasir untuk project UTS pemrograman web
