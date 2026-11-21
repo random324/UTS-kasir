@@ -15,7 +15,6 @@
       background-color: #ffffff;
       padding: 20px 20px 20px 50px;
       position: fixed;
-      border-right: 1px solid #b3adad;
 
     }
     .sidebar .sidebar-item .sidebar-header {
@@ -34,27 +33,45 @@
       gap: 10px;
 
     }
+    .sidebar .sidebar-item .nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    }
+
     .sidebar .sidebar-item .nav-list .list {
-      height: 35px;
-      display: flex;
-      flex-direction: column;
-      padding-left: 20px;
-      justify-content: center;
-      border-radius: 0px;
-      background-color: #ffffff;
-      transition: all 500ms;
+    height: 40px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    overflow: hidden;
+    transition: background-color 200ms ease;
     }
-    .sidebar .sidebar-item .nav-list .list:hover {
-      background-color: #5ebfe87b;
-      border-radius: 10px;
-      transition: all 500ms;
+
+    .sidebar .sidebar-item .nav-list .list li {
+    width: 100%;
+    height: 100%;
+    list-style: none;
     }
+
     .sidebar .sidebar-item .nav-list .list .nav-item {
-      text-decoration: none;
-      color: black;      
-      height: 50px;
-      font-size: 16px;
-      font-weight: 500;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding-left: 20px;
+    text-decoration: none;
+    color: #111827;
+    font-size: 16px;
+    font-weight: 500;
+    transition: color 200ms ease, background-color 200ms ease;
+    }
+
+    .sidebar .sidebar-item .nav-list .list:hover {
+    background-color: #202A44;
+    }
+
+    .sidebar .sidebar-item .nav-list .list:hover .nav-item {
+    color: #ffffff;
     }
     .sidebar .logout .logout-btn{
       text-decoration: none;
@@ -71,7 +88,7 @@
       padding: 10px 20px 10px 20px;
       height: 45px;
       z-index: 100;
-      background-color: rgba(255, 255, 255, 0.4);
+      background-color: rgba(255, 255, 255, 0.749);
       backdrop-filter: blur(2px);
     }
     .location {
@@ -80,12 +97,13 @@
     }
     .main {
       padding: 10px;
-      background-color: #e5dbdb;     
+      background-color: #202A44;     
     }
     .main .content {    
-      background-color: #ffffff;
+      background-color: #ffffffd0;
       height: 100vh;
       border-radius: 20px;
-      padding: 10px;
+      padding:10px;
       margin: 45px 0 0 250px;
+      backdrop-filter: blur(10px);
     }
