@@ -1,0 +1,91 @@
+*{
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    }
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 250px;
+      background-color: #ffffff;
+      padding: 20px 20px 20px 50px;
+      position: fixed;
+      border-right: 1px solid #b3adad;
+
+    }
+    .sidebar .sidebar-item .sidebar-header {
+      padding: 0 0 20px 0;
+    }
+    .sidebar .sidebar-item .sidebar-header .brand{
+      font-size: 30px;
+      font-weight: 600;
+      letter-spacing: 5px;
+
+    }
+    .sidebar .sidebar-item .item .nav-list{
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+    }
+    .sidebar .sidebar-item .nav-list .list {
+      height: 35px;
+      display: flex;
+      flex-direction: column;
+      padding-left: 20px;
+      justify-content: center;
+      border-radius: 0px;
+      background-color: #ffffff;
+      transition: all 500ms;
+    }
+    .sidebar .sidebar-item .nav-list .list:hover {
+      background-color: #5ebfe87b;
+      border-radius: 10px;
+      transition: all 500ms;
+    }
+    .sidebar .sidebar-item .nav-list .list .nav-item {
+      text-decoration: none;
+      color: black;      
+      height: 50px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .sidebar .logout .logout-btn{
+      text-decoration: none;
+      color: black;
+    }
+    .main .navbar {
+      display: flex;
+      position: fixed;
+      justify-content: space-between;
+      align-items: center;
+      top: 0;
+      left: 250px;
+      right: 0;
+      padding: 10px 20px 10px 20px;
+      height: 45px;
+      z-index: 100;
+      background-color: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(2px);
+    }
+    .location {
+      font-size: 20px;
+      letter-spacing: 1px;
+    }
+    .main {
+      padding: 10px;
+      background-color: #e5dbdb;     
+    }
+    .main .content {    
+      background-color: #ffffff;
+      height: 100vh;
+      border-radius: 20px;
+      padding: 10px;
+      margin: 45px 0 0 250px;
+    }
