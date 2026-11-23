@@ -100,10 +100,10 @@
       background-color: #202A44;     
     }
     .main .content {    
-      background-color: #ffffffd0;
+      background-color: #ffffff;
       height: 100vh;
       border-radius: 20px;
       padding:10px;
       margin: 45px 0 0 250px;
-      backdrop-filter: blur(10px);
     }
+

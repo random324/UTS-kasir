@@ -1,1 +1,1 @@
-Ini adalah aplikasi kasir untuk project UTS pemrograman web
+Nama folder nya tidak bisa menggunakan format penamaan yang sudah di tentukan, karena jika format nya sama setelah di coba style nya tidak berfungsi.
