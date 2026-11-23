@@ -1,5 +1,6 @@
 <?php
 $pageTitle = $pageTitle ?? 'Aplikasi kasir';
+$role_login = strtolower($_SESSION['role'] ?? '');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -18,24 +19,27 @@ $pageTitle = $pageTitle ?? 'Aplikasi kasir';
       <div class="item">
         <ul class="nav-list">
           <div class="list">
-            <li><a href="dashboard.php" class="nav-item">Dasboard</a></li>
+            <li><a href="dashboard.php" class="nav-item">Dashboard</a></li>
           </div>
           <div class="list">
-             <li><a href="transaksi.php" class="nav-item">Transaksi</a></li>
+            <li><a href="transaksi.php" class="nav-item">Transaksi</a></li>
           </div>
-          <div class="list">
-            <li><a href="produk.php" class="nav-item">Produk</a></li>
-          </div>
-          <div class="list">
-            <li><a href="kategori.php" class="nav-item">Kategori</a></li>
-          </div>
-          <div class="list">
-            <li><a href="" class="nav-item">Pengguna</a></li>
-          </div>
+
+          <?php if ($role_login === 'admin'): ?>
+            <div class="list">
+              <li><a href="produk.php" class="nav-item">Produk</a></li>
+            </div>
+            <div class="list">
+              <li><a href="kategori.php" class="nav-item">Kategori</a></li>
+            </div>
+            <div class="list">
+              <li><a href="karyawan.php" class="nav-item">Karyawan</a></li>
+            </div>
+          <?php endif; ?>
         </ul>
       </div>
     </div>
     <div class="logout">
-      <a href="" class="logout-btn">Log-out</a>
+      <a href="logout.php" class="logout-btn">Log-out</a>
     </div>
   </aside>

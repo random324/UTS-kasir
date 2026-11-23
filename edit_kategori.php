@@ -1,0 +1,172 @@
+<?php 
+session_start();
+include 'database/koneksi.php';
+$pageTitle = 'Edit Kategori - Aplikasi Kasir';
+
+$pesan = "";
+$tipe_pesan = "";
+
+// Cek parameter ID di URL
+if (!isset($_GET['id']) || trim($_GET['id']) === "") {
+    header("Location: kategori.php");
+    exit;
+}
+
+$id_lama = trim($_GET['id']);
+
+// Ambil data kategori yang akan diedit
+$stmt = mysqli_prepare($conn, "SELECT id, nama_kategori FROM kategori WHERE id = ?");
+mysqli_stmt_bind_param($stmt, "s", $id_lama);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$data = mysqli_fetch_assoc($result);
+mysqli_stmt_close($stmt);
+
+if (!$data) {
+    echo "<script>alert('Data kategori tidak ditemukan!'); window.location='kategori.php';</script>";
+    exit;
+}
+
+// Proses update saat form disubmit
+if (isset($_POST['update'])) {
+    $nama_kategori_baru = trim($_POST['nama_kategori']);
+
+    if ($nama_kategori_baru === "") {
+        $pesan = "Nama kategori wajib diisi!";
+        $tipe_pesan = "error";
+    } else {
+        $update_stmt = mysqli_prepare($conn, "UPDATE kategori SET nama_kategori = ? WHERE id = ?");
+        mysqli_stmt_bind_param($update_stmt, "ss", $nama_kategori_baru, $id_lama);
+
+        if (mysqli_stmt_execute($update_stmt)) {
+            mysqli_stmt_close($update_stmt);
+            echo "<script>alert('Data kategori berhasil diperbarui!'); window.location='kategori.php';</script>";
+            exit;
+        } else {
+            $pesan = "Gagal memperbarui data: " . mysqli_error($conn);
+            $tipe_pesan = "error";
+            mysqli_stmt_close($update_stmt);
+        }
+    }
+}
+include 'layout/sidebar.php';
+include 'layout/navbar.php';
+?>
+<style>
+    .alert {
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 18px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    .alert-error {
+        background-color: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+    .form-section h2 {
+        font-size: 18px;
+        margin-bottom: 18px;
+        color: #111827;
+    }
+    .data-form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .form-row {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    .form-group {
+        flex: 1;
+        min-width: 180px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .form-group label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+    }
+    .form-group input {
+        padding: 9px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s;
+        background-color: #ffffff;
+    }
+    .form-group input:focus {
+        border-color: #111827;
+    }
+    .form-group input[readonly] {
+        background-color: #f3f4f6;
+        color: #6b7280;
+    }
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 6px;
+    }
+    .btn {
+        padding: 10px 18px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+    .btn:hover {
+        opacity: 0.9;
+    }
+    .btn-primary {
+        background-color: #111827;
+        color: #ffffff;
+    }
+    .btn-secondary {
+        background-color: #e5e7eb;
+        color: #374151;
+    }
+</style>
+
+<div class="content">
+    <?php if ($pesan !== ""): ?>
+        <div class="alert alert-error">
+            <?= htmlspecialchars($pesan) ?>
+        </div>
+    <?php endif; ?>
+
+    <section class="form-section">
+        <h2>Edit Data Kategori</h2>
+        <form action="" method="POST" class="data-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="id">ID Kategori</label>
+                    <input type="text" id="id" name="id" value="<?= htmlspecialchars($data['id']) ?>" readonly>
+                </div>
+                <div class="form-group" style="flex: 2;">
+                    <label for="nama_kategori">Nama Kategori</label>
+                    <input type="text" id="nama_kategori" name="nama_kategori" maxlength="50" value="<?= htmlspecialchars($data['nama_kategori']) ?>" required>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" name="update" class="btn btn-primary">Simpan Perubahan</button>
+                <a href="kategori.php" class="btn btn-secondary">Batal</a>
+            </div>
+        </form>
+    </section>
+</div>
+
+<?php 
+include 'layout/footer.php';
+?>
