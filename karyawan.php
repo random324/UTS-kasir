@@ -8,7 +8,6 @@ $pageTitle = 'Karyawan - Aplikasi Kasir';
 $pesan = "";
 $tipe_pesan = "";
 
-// Data untuk mode edit (jika tombol Edit diklik)
 $edit_data = null;
 if (isset($_GET['edit'])) {
     $id_edit = trim($_GET['edit']);
@@ -20,7 +19,6 @@ if (isset($_GET['edit'])) {
     mysqli_stmt_close($stmt_e);
 }
 
-// PROSES SIMPAN BARU ATAU UPDATE KARYAWAN
 if (isset($_POST['simpan_karyawan'])) {
     $mode     = $_POST['mode'] ?? 'tambah';
     $id       = trim($_POST['id']);
@@ -38,7 +36,6 @@ if (isset($_POST['simpan_karyawan'])) {
         $tipe_pesan = "error";
     } else {
         if ($mode === 'edit') {
-            // UPDATE DATA KARYAWAN (password diupdate hanya jika kolom password diisi)
             if ($password !== "") {
                 $password_hash = password_hash($password, PASSWORD_DEFAULT);
                 $sql = "UPDATE user SET nama = ?, username = ?, password = ?, role = ?, status = ? WHERE id = ?";
@@ -61,7 +58,6 @@ if (isset($_POST['simpan_karyawan'])) {
             mysqli_stmt_close($stmt);
 
         } else {
-            // TAMBAH DATA KARYAWAN BARU
             if ($password === "") {
                 $pesan = "Password wajib diisi untuk karyawan baru!";
                 $tipe_pesan = "error";
@@ -95,7 +91,6 @@ if (isset($_POST['simpan_karyawan'])) {
     }
 }
 
-// AMBIL SEMUA DATA KARYAWAN / USER
 $karyawan_list = [];
 $q_user = mysqli_query($conn, "SELECT id, nama, username, role, status FROM user ORDER BY id ASC");
 if ($q_user) {
@@ -108,53 +103,145 @@ include 'layout/sidebar.php';
 include 'layout/navbar.php';
 ?>
 <style>
-    .alert {
-        padding: 12px 16px; border-radius: 6px; margin-bottom: 18px;
-        font-size: 14px; font-weight: 500;
-    }
-    .alert-success { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-    .alert-error { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+.alert {
+    padding: 12px 16px; 
+    border-radius: 6px; 
+    margin-bottom: 18px;
+    font-size: 14px; 
+    font-weight: 500;
+}
+.alert-success { 
+    background-color: #d1fae5; 
+    color: #065f46; 
+    border: 1px solid #a7f3d0; 
+}
+.alert-error { 
+    background-color: #fee2e2; 
+    color: #991b1b; 
+    border: 1px solid #fecaca; 
+}
 
-    .form-section h2, .table-section h2 {
-        font-size: 18px; margin-bottom: 16px; color: #111827;
-    }
-    .data-form { display: flex; flex-direction: column; gap: 14px; }
-    .form-row { display: flex; gap: 16px; flex-wrap: wrap; }
-    .form-group { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 6px; }
-    .form-group label { font-size: 13px; font-weight: 600; color: #374151; }
-    .form-group input, .form-group select {
-        padding: 9px 12px; border: 1px solid #d1d5db; border-radius: 6px;
-        font-size: 14px; outline: none; background-color: #ffffff;
-    }
-    .form-group input[readonly] { background-color: #f3f4f6; color: #6b7280; }
-    .form-actions { display: flex; gap: 10px; margin-top: 4px; }
-    .btn {
-        padding: 10px 18px; border: none; border-radius: 6px; font-size: 14px;
-        font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center;
-    }
-    .btn-primary { background-color: #111827; color: #ffffff; }
-    .btn-secondary { background-color: #e5e7eb; color: #374151; }
+.form-section h2, .table-section h2 {
+    font-size: 18px; 
+    margin-bottom: 16px; 
+    color: #111827;
+}
+.data-form { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 14px; 
+}
+.form-row { 
+    display: flex; 
+    gap: 16px; 
+    flex-wrap: wrap; 
+}
+.form-group { 
+    flex: 1; 
+    min-width: 180px; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 6px; 
+}
+.form-group label { 
+    font-size: 13px; 
+    font-weight: 600; 
+    color: #374151; 
+}
+.form-group input, .form-group select {
+    padding: 9px 12px; 
+    border: 1px solid #d1d5db; 
+    border-radius: 6px;
+    font-size: 14px; 
+    outline: none; 
+    background-color: #ffffff;
+}
+.form-group input[readonly] { 
+    background-color: #f3f4f6; 
+    color: #6b7280; 
+}
+.form-actions { 
+    display: flex; 
+    gap: 10px; 
+    margin-top: 4px; 
+}
+.btn {
+    padding: 10px 18px; 
+    border: none; 
+    border-radius: 6px; 
+    font-size: 14px;
+    font-weight: 500; 
+    cursor: pointer; 
+    text-decoration: none; 
+    display: inline-flex; 
+    align-items: center;
+}
+.btn-primary { 
+    background-color: #111827; 
+    color: #ffffff; 
+}
+.btn-secondary { 
+    background-color: #e5e7eb;
+    color: #374151; 
+}
 
-    .divider { border: none; border-top: 1px solid #e5e7eb; margin: 26px 0; }
-    .table-responsive { overflow-x: auto; }
-    .data-table { width: 100%; border-collapse: collapse; font-size: 14px; white-space: nowrap; }
-    .data-table th, .data-table td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-    .data-table th { background-color: #f3f4f6; color: #111827; font-weight: 600; }
-    .data-table tbody tr:hover { background-color: #f9fafb; }
+.divider { 
+    border: none; 
+    border-top: 1px solid #e5e7eb; 
+    margin: 26px 0; 
+}
+.table-responsive { 
+    overflow-x: auto; 
+}
+.data-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    font-size: 14px; 
+    white-space: nowrap; 
+}
+.data-table th, .data-table td { 
+    padding: 12px; 
+    text-align: left; 
+    border-bottom: 1px solid #e5e7eb; 
+}
+.data-table th { 
+    background-color: #f3f4f6; 
+    color: #111827; 
+    font-weight: 600; 
+}
+.data-table tbody tr:hover { 
+    background-color: #f9fafb; 
+}
 
-    .status-badge {
-        display: inline-block; padding: 3px 9px; border-radius: 999px;
-        font-size: 12px; font-weight: 600;
-    }
-    .status-aktif { background-color: #d1fae5; color: #047857; }
-    .status-nonaktif { background-color: #fee2e2; color: #b91c1c; }
+.status-badge {
+    display: inline-block; 
+    padding: 3px 9px; 
+    border-radius: 999px;
+    font-size: 12px; 
+    font-weight: 600;
+}
+.status-aktif { 
+    background-color: #d1fae5; 
+    color: #047857; 
+}
+.status-nonaktif { 
+    background-color: #fee2e2; 
+    color: #b91c1c; 
+}
 
-    .btn-edit {
-        display: inline-block; padding: 5px 10px; border-radius: 4px;
-        background-color: #fef3c7; color: #b45309; text-decoration: none;
-        font-size: 12px; font-weight: 600;
-    }
-    .btn-edit:hover { background-color: #fde68a; }
+.btn-edit {
+    display: inline-block; 
+    padding: 5px 10px; 
+    border-radius: 4px;
+    background-color: #fef3c7; 
+    color: #b45309; 
+    text-decoration: none;
+    font-size: 12px; 
+    font-weight: 600;
+}
+.btn-edit:hover { 
+    background-color: #fde68a; 
+}
 </style>
 
 <div class="content">

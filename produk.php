@@ -6,7 +6,6 @@ $pageTitle = 'Produk - Aplikasi Kasir';
 $pesan = "";
 $tipe_pesan = "";
 
-// PROSES SIMPAN DATA PRODUK
 if (isset($_POST['simpan'])) {
     $id          = trim($_POST['id']);
     $kode        = trim($_POST['kode']);
@@ -21,7 +20,6 @@ if (isset($_POST['simpan'])) {
         $pesan = "Semua kolom wajib diisi!";
         $tipe_pesan = "error";
     } else {
-        // Cek apakah ID produk sudah ada
         $cek_stmt = mysqli_prepare($conn, "SELECT id FROM produk WHERE id = ?");
         mysqli_stmt_bind_param($cek_stmt, "s", $id);
         mysqli_stmt_execute($cek_stmt);
@@ -31,7 +29,6 @@ if (isset($_POST['simpan'])) {
             $pesan = "ID Produk '$id' sudah digunakan!";
             $tipe_pesan = "error";
         } else {
-            // Insert data ke tabel produk (kolom haga_jual sesuai database)
             $sql = "INSERT INTO produk (id, kode, nama, kategori_id, harga_beli, haga_jual, stok, satuan) 
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             $insert_stmt = mysqli_prepare($conn, $sql);
@@ -50,10 +47,8 @@ if (isset($_POST['simpan'])) {
     }
 }
 
-// AMBIL DATA KATEGORI UNTUK DROPDOWN SELECT
 $kategori_query = mysqli_query($conn, "SELECT id, nama_kategori FROM kategori ORDER BY nama_kategori ASC");
 
-// AMBIL DATA PRODUK (JOIN DENGAN TABEL KATEGORI AGAR NAMA KATEGORI TAMPIL)
 $produk_query = mysqli_query($conn, "
     SELECT p.*, k.nama_kategori 
     FROM produk p 
@@ -111,106 +106,106 @@ include 'layout/navbar.php';
         color: #374151;
     }
     .form-group input,
-    .form-group select {
-        padding: 9px 12px;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        font-size: 14px;
-        outline: none;
-        transition: border-color 0.2s;
-        background-color: #ffffff;
-    }
-    .form-group input:focus,
-    .form-group select:focus {
-        border-color: #111827;
-    }
-    .form-actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 6px;
-    }
-    .btn {
-        padding: 10px 18px;
-        border: none;
-        border-radius: 6px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: opacity 0.2s;
-    }
-    .btn:hover {
-        opacity: 0.9;
-    }
-    .btn-primary {
-        background-color: #111827;
-        color: #ffffff;
-    }
-    .btn-secondary {
-        background-color: #e5e7eb;
-        color: #374151;
-    }
-    .divider {
-        border: none;
-        border-top: 1px solid #e5e7eb;
-        margin: 28px 0;
-    }
-    .table-responsive {
-        overflow-x: auto;
-    }
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
-        white-space: nowrap;
-    }
-    .data-table th,
-    .data-table td {
-        padding: 12px 12px;
-        text-align: left;
-        border-bottom: 1px solid #e5e7eb;
-    }
-    .data-table th {
-        background-color: #f3f4f6;
-        color: #111827;
-        font-weight: 600;
-    }
-    .data-table tbody tr:hover {
-        background-color: #f9fafb;
-    }
-    .action-cell {
-        display: flex;
-        gap: 6px;
-    }
-    .btn-action {
-        display: inline-block;
-        padding: 5px 10px;
-        border-radius: 4px;
-        text-decoration: none;
-        font-size: 12px;
-        font-weight: 600;
-        transition: background-color 0.2s;
-    }
-    .btn-edit {
-        background-color: #fef3c7;
-        color: #b45309;
-    }
-    .btn-edit:hover {
-        background-color: #fde68a;
-    }
-    .btn-restok {
-        background-color: #d1fae5;
-        color: #047857;
-    }
-    .btn-restok:hover {
-        background-color: #a7f3d0;
-    }
-    .btn-delete {
-        background-color: #fee2e2;
-        color: #b91c1c;
-    }
-    .btn-delete:hover {
-        background-color: #fecaca;
-    }
+.form-group select {
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    background-color: #ffffff;
+}
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #111827;
+}
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+.btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.btn:hover {
+    opacity: 0.9;
+}
+.btn-primary {
+    background-color: #111827;
+    color: #ffffff;
+}
+.btn-secondary {
+    background-color: #e5e7eb;
+    color: #374151;
+}
+.divider {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 28px 0;
+}
+.table-responsive {
+    overflow-x: auto;
+}
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    white-space: nowrap;
+}
+.data-table th,
+.data-table td {
+    padding: 12px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+.data-table th {
+    background-color: #f3f4f6;
+    color: #111827;
+    font-weight: 600;
+}
+.data-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+.action-cell {
+    display: flex;
+    gap: 6px;
+}
+.btn-action {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+.btn-edit {
+    background-color: #fef3c7;
+    color: #b45309;
+}
+.btn-edit:hover {
+    background-color: #fde68a;
+}
+.btn-restok {
+    background-color: #d1fae5;
+    color: #047857;
+}
+.btn-restok:hover {
+    background-color: #a7f3d0;
+}
+.btn-delete {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+.btn-delete:hover {
+    background-color: #fecaca;
+}
 </style>
 
 <div class="content">
@@ -220,12 +215,10 @@ include 'layout/navbar.php';
         </div>
     <?php endif; ?>
 
-    <!-- FORM INPUT DATA PRODUK -->
     <section class="form-section">
         <h2>Tambah Data Produk</h2>
         <form action="" method="POST" class="data-form">
-            
-            <!-- Baris 1: ID, Kode, Nama -->
+
             <div class="form-row">
                 <div class="form-group">
                     <label for="id">ID Produk</label>
@@ -241,7 +234,6 @@ include 'layout/navbar.php';
                 </div>
             </div>
 
-            <!-- Baris 2: Kategori (Dinamis dari DB) & Satuan -->
             <div class="form-row">
                 <div class="form-group">
                     <label for="kategori_id">Kategori</label>
@@ -269,7 +261,6 @@ include 'layout/navbar.php';
                 </div>
             </div>
 
-            <!-- Baris 3: Harga Beli, Harga Jual, Stok -->
             <div class="form-row">
                 <div class="form-group">
                     <label for="harga_beli">Harga Beli (Rp)</label>
@@ -294,7 +285,6 @@ include 'layout/navbar.php';
 
     <hr class="divider">
 
-    <!-- TABEL MENAMPILKAN DATA PRODUK -->
     <section class="table-section">
         <h2>Daftar Produk</h2>
         <div class="table-responsive">

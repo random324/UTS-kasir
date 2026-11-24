@@ -12,7 +12,6 @@ if (!isset($_GET['id']) || trim($_GET['id']) === "") {
 
 $id = trim($_GET['id']);
 
-// Ambil info produk
 $stmt = mysqli_prepare($conn, "SELECT id, kode, nama, stok, satuan FROM produk WHERE id = ?");
 mysqli_stmt_bind_param($stmt, "s", $id);
 mysqli_stmt_execute($stmt);
@@ -25,7 +24,6 @@ if (!$data) {
     exit;
 }
 
-// Proses penambahan stok
 if (isset($_POST['proses_restok'])) {
     $tambah_stok = (int) $_POST['tambah_stok'];
 
@@ -50,27 +48,78 @@ include 'layout/sidebar.php';
 include 'layout/navbar.php';
 ?>
 <style>
-    .alert-error {
-        padding: 12px 16px; border-radius: 6px; margin-bottom: 18px; font-size: 14px;
-        background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca;
-    }
-    .form-section h2 { font-size: 18px; margin-bottom: 18px; color: #111827; }
-    .data-form { display: flex; flex-direction: column; gap: 15px; }
-    .form-row { display: flex; gap: 16px; flex-wrap: wrap; }
-    .form-group { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 6px; }
-    .form-group label { font-size: 13px; font-weight: 600; color: #374151; }
-    .form-group input {
-        padding: 9px 12px; border: 1px solid #d1d5db; border-radius: 6px;
-        font-size: 14px; outline: none; background-color: #ffffff;
-    }
-    .form-group input[readonly] { background-color: #f3f4f6; color: #6b7280; }
-    .form-actions { display: flex; gap: 10px; margin-top: 6px; }
-    .btn {
-        padding: 10px 18px; border: none; border-radius: 6px; font-size: 14px;
-        font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center;
-    }
-    .btn-restok-submit { background-color: #047857; color: #ffffff; }
-    .btn-secondary { background-color: #e5e7eb; color: #374151; }
+.alert-error {
+    padding: 12px 16px; 
+    border-radius: 6px; 
+    margin-bottom: 18px; 
+    font-size: 14px;
+    background-color: #fee2e2; 
+    color: #991b1b; 
+    border: 1px solid #fecaca;
+}
+.form-section h2 { 
+    font-size: 18px; 
+    margin-bottom: 18px; 
+    color: #111827; 
+}
+.data-form { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; 
+}
+.form-row { 
+    display: flex; 
+    gap: 16px; 
+    flex-wrap: wrap; 
+}
+.form-group { 
+    flex: 1; 
+    min-width: 180px; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 6px;
+}
+.form-group label { 
+    font-size: 13px; 
+    font-weight: 600; 
+    color: #374151; 
+}
+.form-group input {
+    padding: 9px 12px; 
+    border: 1px solid #d1d5db; 
+    border-radius: 6px;
+    font-size: 14px; 
+    outline: none; 
+    background-color: #ffffff;
+}
+.form-group input[readonly] { 
+    background-color: #f3f4f6; 
+    color: #6b7280; 
+}
+.form-actions { 
+    display: flex; 
+    gap: 10px; 
+    margin-top: 6px; 
+}
+.btn {
+    padding: 10px 18px; 
+    border: none;
+    border-radius: 6px; 
+    font-size: 14px;
+    font-weight: 500; 
+    cursor: pointer; 
+    text-decoration: none; 
+    display: inline-flex; 
+    align-items: center;
+}
+.btn-restok-submit { 
+    background-color: #047857; 
+    color: #ffffff; 
+}
+.btn-secondary { 
+    background-color: #e5e7eb; 
+    color: #374151; 
+}
 </style>
 
 <div class="content">

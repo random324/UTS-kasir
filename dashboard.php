@@ -3,7 +3,6 @@ session_start();
 include 'database/koneksi.php';
 $pageTitle = 'Dashboard - Aplikasi Kasir';
 
-// 1. AMBIL 3 BARANG TERLARIS
 $terlaris_list = [];
 $q_terlaris = mysqli_query($conn, "
     SELECT p.id, p.kode, p.nama, p.satuan, COALESCE(SUM(dt.jumlah), 0) AS total_terjual
@@ -19,7 +18,6 @@ if ($q_terlaris) {
     }
 }
 
-// 2. AMBIL PRODUK STOK MENIPIS & STOK HABIS (stok <= 15 atau stok == 0)
 $stok_menipis_list = [];
 $q_menipis = mysqli_query($conn, "
     SELECT id, kode, nama, stok, satuan
@@ -41,7 +39,6 @@ if ($q_menipis) {
     }
 }
 
-// 3. HITUNG KEUNTUNGAN HARI INI
 $keuntungan_hari_ini = 0;
 $q_untung = mysqli_query($conn, "
     SELECT COALESCE(SUM((dt.harga_satuan - dt.harga_beli) * dt.jumlah), 0) AS keuntungan
@@ -67,7 +64,6 @@ if ($q_ringkasan) {
     $jumlah_trx_hari_ini = (int) ($d_ringkasan['jml_trx'] ?? 0);
 }
 
-// 4. AMBIL DAFTAR TRANSAKSI HARI INI (JOIN DENGAN TABEL USER UNTUK MENGAMBIL NAMA)
 $transaksi_hari_ini = [];
 $q_trx = mysqli_query($conn, "
     SELECT t.id, t.tanggal, t.user_id, u.nama AS nama_user, t.total, t.bayar, t.kembali, t.`metode bayar` AS metode_bayar
@@ -86,224 +82,219 @@ include 'layout/sidebar.php';
 include 'layout/navbar.php';
 ?>
 <style>
-    /* --- TIGA KOTAK ATAS --- */
-    .dashboard-cards {
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
-        align-items: stretch;
-    }
+.dashboard-cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
 
-    .info-card {
-        flex: 1;
-        min-width: 280px;
-        border: 1px solid #e5e7eb;
-        border-radius: 10px;
-        padding: 18px 20px;
-        background-color: #ffffff;
-        display: flex;
-        flex-direction: column;
-    }
+.info-card {
+    flex: 1;
+    min-width: 280px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 18px 20px;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+}
 
-    .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 14px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #f3f4f6;
-    }
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f3f4f6;
+}
 
-    .card-header h3 {
-        font-size: 16px;
-        color: #111827;
-    }
+.card-header h3 {
+    font-size: 16px;
+    color: #111827;
+}
 
-    .badge {
-        font-size: 11px;
-        font-weight: 600;
-        padding: 4px 8px;
-        border-radius: 999px;
-    }
+.badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 999px;
+}
 
-    .badge-info {
-        background-color: #dbeafe;
-        color: #1d4ed8;
-    }
+.badge-info {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+}
 
-    .badge-warning {
-        background-color: #fef3c7;
-        color: #b45309;
-    }
+.badge-warning {
+    background-color: #fef3c7;
+    color: #b45309;
+}
 
-    .badge-success {
-        background-color: #d1fae5;
-        color: #047857;
-    }
+.badge-success {
+    background-color: #d1fae5;
+    color: #047857;
+}
 
-    .card-list {
-        list-style: none;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        max-height: 240px;
-        overflow-y: auto;
-    }
+.card-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 240px;
+    overflow-y: auto;
+}
 
-    .card-list-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 8px 10px;
-        border-radius: 6px;
-        background-color: #f9fafb;
-        gap: 10px;
-    }
+.card-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background-color: #f9fafb;
+    gap: 10px;
+}
 
-    .card-list-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 8px 10px;
-        border-radius: 6px;
-        background-color: #fef2f2;
-        gap: 10px;
-    }
+.card-list-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background-color: #fef2f2;
+    gap: 10px;
+}
 
-    .item-title {
-        font-size: 14px;
-        font-weight: 600;
-        color: #111827;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        flex-wrap: wrap;
-    }
+.item-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
 
-    .item-sub {
-        font-size: 12px;
-        color: #6b7280;
-        margin-top: 3px;
-    }
+.item-sub {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 3px;
+}
 
-    .status-pill {
-        font-size: 10px;
-        font-weight: 700;
-        padding: 2px 6px;
-        border-radius: 4px;
-    }
+.status-pill {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
 
-    .status-habis {
-        background-color: #fee2e2;
-        color: #b91c1c;
-    }
+.status-habis {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
 
-    .status-menipis {
-        background-color: #fef3c7;
-        color: #b45309;
-    }
+.status-menipis {
+    background-color: #fef3c7;
+    color: #b45309;
+}
 
-    .item-stat {
-        font-size: 12px;
-        font-weight: 600;
-        color: #111827;
-        background-color: #e5e7eb;
-        padding: 4px 8px;
-        border-radius: 4px;
-        white-space: nowrap;
-    }
+.item-stat {
+    font-size: 12px;
+    font-weight: 600;
+    color: #111827;
+    background-color: #e5e7eb;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
 
-    .btn-restok-mini {
-        font-size: 12px;
-        font-weight: 600;
-        color: #047857;
-        background-color: #d1fae5;
-        padding: 5px 10px;
-        border-radius: 4px;
-        text-decoration: none;
-        white-space: nowrap;
-        transition: background-color 0.2s;
-    }
+.btn-restok-mini {
+    font-size: 12px;
+    font-weight: 600;
+    color: #047857;
+    background-color: #d1fae5;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 0.2s;
+}
 
-    .btn-restok-mini:hover {
-        background-color: #a7f3d0;
-    }
+.btn-restok-mini:hover {
+    background-color: #a7f3d0;
+}
 
-    /* --- KOTAK KEUNTUNGAN HARI INI --- */
-    .profit-box {
-        padding: 12px 0;
-        margin: auto 0;
-    }
+.profit-box {
+    padding: 12px 0;
+    margin: auto 0;
+}
 
-    .profit-amount {
-        font-size: 26px;
-        font-weight: 700;
-        color: #047857;
-        margin-bottom: 8px;
-    }
+.profit-amount {
+    font-size: 26px;
+    font-weight: 700;
+    color: #047857;
+    margin-bottom: 8px;
+}
 
-    .profit-meta {
-        font-size: 12px;
-        color: #6b7280;
-        line-height: 1.6;
-    }
+.profit-meta {
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.6;
+}
 
-    .empty-text {
-        font-size: 13px;
-        color: #6b7280;
-        padding: 14px 0;
-        text-align: center;
-    }
+.empty-text {
+    font-size: 13px;
+    color: #6b7280;
+    padding: 14px 0;
+    text-align: center;
+}
 
-    .divider {
-        border: none;
-        border-top: 1px solid #e5e7eb;
-        margin: 26px 0;
-    }
+.divider {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 26px 0;
+}
 
-    /* --- TABEL TRANSAKSI HARI INI --- */
-    .table-section h2 {
-        font-size: 18px;
-        margin-bottom: 16px;
-        color: #111827;
-    }
+.table-section h2 {
+    font-size: 18px;
+    margin-bottom: 16px;
+    color: #111827;
+}
 
-    .table-responsive {
-        overflow-x: auto;
-    }
+.table-responsive {
+    overflow-x: auto;
+}
 
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
-        white-space: nowrap;
-    }
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    white-space: nowrap;
+}
 
-    .data-table th,
-    .data-table td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #e5e7eb;
-    }
+.data-table th,
+.data-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
 
-    .data-table th {
-        background-color: #f3f4f6;
-        color: #111827;
-        font-weight: 600;
-    }
+.data-table th {
+    background-color: #f3f4f6;
+    color: #111827;
+    font-weight: 600;
+}
 
-    .data-table tbody tr:hover {
-        background-color: #f9fafb;
-    }
+.data-table tbody tr:hover {
+    background-color: #f9fafb;
+}
 </style>
 
 <div class="content">
     <section class="dashboard-section">
 
-        <!-- BAGIAN 1: TIGA KOTAK ATAS -->
         <div class="dashboard-cards">
 
-            <!-- Kotak 1: Barang Terlaris -->
             <div class="info-card">
                 <div class="card-header">
                     <h3>Barang Terlaris</h3>
@@ -326,7 +317,6 @@ include 'layout/navbar.php';
                 <?php endif; ?>
             </div>
 
-            <!-- Kotak 2: Stok Menipis -->
             <div class="info-card">
                 <div class="card-header">
                     <h3>Stok Menipis</h3>
@@ -354,7 +344,6 @@ include 'layout/navbar.php';
                 <?php endif; ?>
             </div>
 
-            <!-- Kotak 3: Keuntungan Hari Ini -->
             <div class="info-card">
                 <div class="card-header">
                     <h3>Keuntungan Hari Ini</h3>
@@ -373,7 +362,6 @@ include 'layout/navbar.php';
 
         <hr class="divider">
 
-        <!-- BAGIAN 2: TABEL TRANSAKSI HARI INI -->
         <div class="table-section">
             <h2>Daftar Transaksi Hari Ini</h2>
             <div class="table-responsive">

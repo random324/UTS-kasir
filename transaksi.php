@@ -6,7 +6,6 @@ $pageTitle = 'Transaksi - Aplikasi Kasir';
 $pesan = "";
 $tipe_pesan = "";
 
-// FUNGSI GENERATE ID TRANSAKSI OTOMATIS (Format: TRX-0001)
 function generateIdTransaksi($conn) {
     $query = mysqli_query($conn, "SELECT MAX(id) AS max_id FROM transaksi WHERE id LIKE 'TRX-%'");
     $data  = mysqli_fetch_assoc($query);
@@ -21,7 +20,6 @@ function generateIdTransaksi($conn) {
     return 'TRX-' . str_pad($urutan, 4, '0', STR_PAD_LEFT);
 }
 
-// PROSES SIMPAN TRANSAKSI (MULTI-ITEM + UPDATE STOK + SIMPAN HARGA BELI)
 if (isset($_POST['simpan_transaksi'])) {
     $id           = generateIdTransaksi($conn);
     $user_id      = trim($_POST['user_id']);
@@ -38,7 +36,6 @@ if (isset($_POST['simpan_transaksi'])) {
         mysqli_begin_transaction($conn);
 
         try {
-            // 1. Gabungkan jika produk yang sama dipilih di beberapa baris
             $keranjang = [];
             for ($i = 0; $i < count($produk_ids); $i++) {
                 $pid = trim($produk_ids[$i]);
@@ -55,7 +52,6 @@ if (isset($_POST['simpan_transaksi'])) {
                 throw new Exception("Pilih minimal 1 produk dengan jumlah minimal 1!");
             }
 
-            // 2. Cek stok & hitung total resmi di server PHP (ambil harga_beli & haga_jual)
             $total_belanja = 0;
             $item_valid = [];
 
@@ -88,13 +84,11 @@ if (isset($_POST['simpan_transaksi'])) {
             }
             mysqli_stmt_close($stmt_produk);
 
-            // 3. Validasi uang bayar & hitung kembali di PHP
             if ($bayar < $total_belanja) {
                 throw new Exception("Uang bayar (Rp " . number_format($bayar, 0, ',', '.') . ") kurang dari total belanja (Rp " . number_format($total_belanja, 0, ',', '.') . ")!");
             }
             $kembali = $bayar - $total_belanja;
 
-            // 4. Simpan ke tabel transaksi
             $sql_trx = "INSERT INTO transaksi (id, user_id, total, bayar, kembali, `metode bayar`) 
                         VALUES (?, ?, ?, ?, ?, ?)";
             $stmt_trx = mysqli_prepare($conn, $sql_trx);
@@ -104,7 +98,6 @@ if (isset($_POST['simpan_transaksi'])) {
             }
             mysqli_stmt_close($stmt_trx);
 
-            // 5. Simpan ke detail_transaksi (termasuk harga_beli) & kurangi stok produk
             $stmt_detail = mysqli_prepare($conn, "INSERT INTO detail_transaksi (transaksi_id, produk_id, jumlah, harga_satuan, harga_beli, subtotal) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt_stok   = mysqli_prepare($conn, "UPDATE produk SET stok = stok - ? WHERE id = ?");
 
@@ -134,10 +127,8 @@ if (isset($_POST['simpan_transaksi'])) {
     }
 }
 
-// Generate ID berikutnya untuk ditampilkan di form input
 $id_otomatis = generateIdTransaksi($conn);
 
-// AMBIL DAFTAR USER UNTUK DROPDOWN KASIR
 $user_list = [];
 $q_user = mysqli_query($conn, "SELECT * FROM user ORDER BY id ASC");
 if ($q_user) {
@@ -146,7 +137,6 @@ if ($q_user) {
     }
 }
 
-// AMBIL DAFTAR PRODUK YANG STOKNYA > 0
 $produk_list = [];
 $q_produk = mysqli_query($conn, "SELECT id, kode, nama, haga_jual, stok, satuan FROM produk WHERE stok > 0 ORDER BY nama ASC");
 if ($q_produk) {
@@ -159,158 +149,158 @@ include 'layout/sidebar.php';
 include 'layout/navbar.php';
 ?>
 <style>
-    .alert {
-        padding: 12px 16px;
-        border-radius: 6px;
-        margin-bottom: 18px;
-        font-size: 14px;
-        font-weight: 500;
-    }
-    .alert-success {
-        background-color: #d1fae5;
-        color: #065f46;
-        border: 1px solid #a7f3d0;
-    }
-    .alert-error {
-        background-color: #fee2e2;
-        color: #991b1b;
-        border: 1px solid #fecaca;
-    }
-    .form-section h2,
-    .items-section h3 {
-        font-size: 18px;
-        margin-bottom: 16px;
-        color: #111827;
-    }
-    .items-section h3 {
-        font-size: 15px;
-        margin-top: 8px;
-        margin-bottom: 10px;
-    }
-    .data-form {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-    .form-row {
-        display: flex;
-        gap: 16px;
-        flex-wrap: wrap;
-    }
-    .form-group {
-        flex: 1;
-        min-width: 180px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-    .form-group label {
-        font-size: 13px;
-        font-weight: 600;
-        color: #374151;
-    }
-    .form-group input,
-    .form-group select {
-        padding: 9px 12px;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        font-size: 14px;
-        outline: none;
-        transition: border-color 0.2s;
-        background-color: #ffffff;
-    }
-    .form-group input:focus,
-    .form-group select:focus {
-        border-color: #111827;
-    }
-    .form-group input[readonly] {
-        background-color: #f3f4f6;
-        color: #111827;
-        font-weight: 600;
-    }
+.alert {
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 18px;
+    font-size: 14px;
+    font-weight: 500;
+}
+.alert-success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+.alert-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+.form-section h2,
+.items-section h3 {
+    font-size: 18px;
+    margin-bottom: 16px;
+    color: #111827;
+}
+.items-section h3 {
+    font-size: 15px;
+    margin-top: 8px;
+    margin-bottom: 10px;
+}
+.data-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.form-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.form-group {
+    flex: 1;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+.form-group input,
+.form-group select {
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    background-color: #ffffff;
+}
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #111827;
+}
+.form-group input[readonly] {
+    background-color: #f3f4f6;
+    color: #111827;
+    font-weight: 600;
+}
 
-    /* --- TABEL KERANJANG BARANG --- */
-    .items-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 10px;
-    }
-    .items-table th,
-    .items-table td {
-        padding: 10px;
-        border: 1px solid #e5e7eb;
-        text-align: left;
-    }
-    .items-table th {
-        background-color: #f3f4f6;
-        font-size: 13px;
-        color: #111827;
-    }
-    .items-table select,
-    .items-table input {
-        width: 100%;
-        padding: 8px 10px;
-        border: 1px solid #d1d5db;
-        border-radius: 5px;
-        font-size: 14px;
-    }
-    .items-table input[readonly] {
-        background-color: #f9fafb;
-        color: #374151;
-    }
-    .btn-add-row {
-        align-self: flex-start;
-        background-color: #dbeafe;
-        color: #1d4ed8;
-        padding: 8px 14px;
-        border: none;
-        border-radius: 6px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-    }
-    .btn-add-row:hover {
-        background-color: #bfdbfe;
-    }
-    .btn-remove-row {
-        background-color: #fee2e2;
-        color: #b91c1c;
-        border: none;
-        padding: 7px 11px;
-        border-radius: 5px;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-    }
-    .btn-remove-row:hover {
-        background-color: #fecaca;
-    }
+/* --- TABEL KERANJANG BARANG --- */
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+.items-table th,
+.items-table td {
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+    text-align: left;
+}
+.items-table th {
+    background-color: #f3f4f6;
+    font-size: 13px;
+    color: #111827;
+}
+.items-table select,
+.items-table input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    font-size: 14px;
+}
+.items-table input[readonly] {
+    background-color: #f9fafb;
+    color: #374151;
+}
+.btn-add-row {
+    align-self: flex-start;
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-add-row:hover {
+    background-color: #bfdbfe;
+}
+.btn-remove-row {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: none;
+    padding: 7px 11px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-remove-row:hover {
+    background-color: #fecaca;
+}
 
-    .form-actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 6px;
-    }
-    .btn {
-        padding: 10px 18px;
-        border: none;
-        border-radius: 6px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: opacity 0.2s;
-    }
-    .btn:hover {
-        opacity: 0.9;
-    }
-    .btn-primary {
-        background-color: #111827;
-        color: #ffffff;
-    }
-    .btn-secondary {
-        background-color: #e5e7eb;
-        color: #374151;
-    }
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+.btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.btn:hover {
+    opacity: 0.9;
+}
+.btn-primary {
+    background-color: #111827;
+    color: #ffffff;
+}
+.btn-secondary {
+    background-color: #e5e7eb;
+    color: #374151;
+}
 </style>
 
 <div class="content">
@@ -320,12 +310,10 @@ include 'layout/navbar.php';
         </div>
     <?php endif; ?>
 
-    <!-- FORM INPUT DATA TRANSAKSI -->
     <section class="form-section">
         <h2>Input Transaksi Kasir</h2>
         <form action="" method="POST" class="data-form">
 
-            <!-- Baris 1: ID Transaksi (Otomatis), User ID, Waktu Otomatis -->
             <div class="form-row">
                 <div class="form-group">
                     <label for="id">ID Transaksi (Otomatis)</label>
@@ -352,7 +340,6 @@ include 'layout/navbar.php';
                 </div>
             </div>
 
-            <!-- BAGIAN PILIH BARANG (BISA LEBIH DARI SATU) -->
             <div class="items-section">
                 <h3>Daftar Barang yang Dibeli</h3>
                 <table class="items-table" id="tabel-barang">
@@ -397,7 +384,6 @@ include 'layout/navbar.php';
                 <button type="button" class="btn-add-row" onclick="tambahBaris()">+ Tambah Barang</button>
             </div>
 
-            <!-- Baris 2: Total (Otomatis), Bayar, Kembali, Metode Bayar -->
             <div class="form-row">
                 <div class="form-group">
                     <label for="total">Total Belanja (Rp)</label>

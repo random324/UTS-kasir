@@ -6,7 +6,6 @@ $pageTitle = 'Dashboard - Aplikasi Kasir';
 $pesan = "";
 $tipe_pesan = "";
 
-// PROSES SIMPAN DATA KATEGORI
 if (isset($_POST['simpan'])) {
     $id            = trim($_POST['id']);
     $nama_kategori = trim($_POST['nama_kategori']);
@@ -15,7 +14,6 @@ if (isset($_POST['simpan'])) {
         $pesan = "ID dan Nama Kategori wajib diisi!";
         $tipe_pesan = "error";
     } else {
-        // Cek apakah ID kategori sudah ada di database
         $cek_stmt = mysqli_prepare($conn, "SELECT id FROM kategori WHERE id = ?");
         mysqli_stmt_bind_param($cek_stmt, "s", $id);
         mysqli_stmt_execute($cek_stmt);
@@ -25,7 +23,6 @@ if (isset($_POST['simpan'])) {
             $pesan = "ID Kategori '$id' sudah digunakan!";
             $tipe_pesan = "error";
         } else {
-            // Insert data baru ke tabel kategori
             $insert_stmt = mysqli_prepare($conn, "INSERT INTO kategori (id, nama_kategori) VALUES (?, ?)");
             mysqli_stmt_bind_param($insert_stmt, "ss", $id, $nama_kategori);
 
@@ -46,7 +43,7 @@ include 'layout/sidebar.php';
 include 'layout/navbar.php';
 ?>
 <style>
-    .form-section h2,
+.form-section h2,
 .table-section h2 {
     font-size: 18px;
     margin-bottom: 18px;
@@ -239,7 +236,6 @@ include 'layout/navbar.php';
 
 <hr class="divider">
 
-<!-- BAGIAN 2: TABEL MENAMPILKAN DATA KATEGORI -->
 <section class="table-section">
     <h2>Daftar Kategori</h2>
     <div class="table-responsive">
