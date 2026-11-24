@@ -1,12 +1,17 @@
 <?php 
-session_start();
+require_once 'auth.php';
+wajibLogin();
+
 include 'database/koneksi.php';
 $pageTitle = 'Transaksi - Aplikasi Kasir';
 
 $pesan = "";
 $tipe_pesan = "";
 
-function generateIdTransaksi($conn) {
+$user_login_id   = $_SESSION['user_id'];
+$user_login_nama = $_SESSION['nama'] ?? ($_SESSION['username'] ?? $user_login_id);
+
+function generateIdTransaksi(mysqli $conn) {
     $query = mysqli_query($conn, "SELECT MAX(id) AS max_id FROM transaksi WHERE id LIKE 'TRX-%'");
     $data  = mysqli_fetch_assoc($query);
     $maxId = $data['max_id'] ?? '';
@@ -22,7 +27,7 @@ function generateIdTransaksi($conn) {
 
 if (isset($_POST['simpan_transaksi'])) {
     $id           = generateIdTransaksi($conn);
-    $user_id      = trim($_POST['user_id']);
+    $user_id      = $user_login_id; // Otomatis dari user yang sedang login
     $bayar        = (int) $_POST['bayar'];
     $metode_bayar = trim($_POST['metode_bayar']);
 
@@ -30,7 +35,7 @@ if (isset($_POST['simpan_transaksi'])) {
     $jumlahs      = $_POST['jumlah'] ?? [];
 
     if ($user_id === "" || $metode_bayar === "" || count($produk_ids) === 0) {
-        $pesan = "Lengkapi data kasir, metode bayar, dan minimal pilih 1 produk!";
+        $pesan = "Lengkapi metode bayar dan minimal pilih 1 produk!";
         $tipe_pesan = "error";
     } else {
         mysqli_begin_transaction($conn);
@@ -128,14 +133,6 @@ if (isset($_POST['simpan_transaksi'])) {
 }
 
 $id_otomatis = generateIdTransaksi($conn);
-
-$user_list = [];
-$q_user = mysqli_query($conn, "SELECT * FROM user ORDER BY id ASC");
-if ($q_user) {
-    while ($u = mysqli_fetch_assoc($q_user)) {
-        $user_list[] = $u;
-    }
-}
 
 $produk_list = [];
 $q_produk = mysqli_query($conn, "SELECT id, kode, nama, haga_jual, stok, satuan FROM produk WHERE stok > 0 ORDER BY nama ASC");
@@ -320,19 +317,9 @@ include 'layout/navbar.php';
                     <input type="text" id="id" name="id" value="<?= htmlspecialchars($id_otomatis) ?>" readonly required>
                 </div>
                 <div class="form-group">
-                    <label for="user_id">Kasir / User</label>
-                    <select id="user_id" name="user_id" required>
-                        <option value="">-- Pilih Kasir / User --</option>
-                        <?php foreach ($user_list as $u): ?>
-                            <?php 
-                                $label_nama = $u['nama'] ?? ($u['username'] ?? '');
-                                $selected = (($_SESSION['user_id'] ?? '') === $u['id']) ? 'selected' : '';
-                            ?>
-                            <option value="<?= htmlspecialchars($u['id']) ?>" <?= $selected ?>>
-                                <?= htmlspecialchars($u['id']) ?><?= $label_nama !== '' ? ' - ' . htmlspecialchars($label_nama) : '' ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <label for="kasir_nama">Kasir / User (Otomatis)</label>
+                    <input type="text" id="kasir_nama" value="<?= htmlspecialchars($user_login_nama) ?>" readonly>
+                    <input type="hidden" name="user_id" value="<?= htmlspecialchars($user_login_id) ?>">
                 </div>
                 <div class="form-group">
                     <label>Waktu Transaksi</label>
