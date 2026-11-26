@@ -27,7 +27,7 @@ function generateIdTransaksi(mysqli $conn) {
 
 if (isset($_POST['simpan_transaksi'])) {
     $id           = generateIdTransaksi($conn);
-    $user_id      = $user_login_id; // Otomatis dari user yang sedang login
+    $user_id      = $user_login_id;
     $bayar        = (int) $_POST['bayar'];
     $metode_bayar = trim($_POST['metode_bayar']);
 
