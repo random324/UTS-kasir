@@ -40,6 +40,6 @@ $role_login = strtolower($_SESSION['role'] ?? '');
       </div>
     </div>
     <div class="logout">
-      <a href="logout.php" class="logout-btn">Log-out</a>
+      <a href="logout.php" class="logout-btn">Logout</a>
     </div>
   </aside>
